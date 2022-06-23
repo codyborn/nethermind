@@ -1,11 +1,11 @@
 name: '[RUN] Nethermind/Ethereum Tests'
 
 concurrency: 
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}  
 
 on: 
   push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -177,21 +177,12 @@ jobs:
     - name: Nethermind.Secp256k1.Test.Linux
       run: |
         dotnet test -c Release src/Nethermind/Nethermind.Secp256k1.Test
-    - name: Nethermind.Runner.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Nethermind.Runner.Test
     - name: Nethermind.State.Test
       run: |
         dotnet test -c Release src/Nethermind/Nethermind.State.Test
-    - name: Nethermind.Trie.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Nethermind.Trie.Test
     - name: Nethermind.Synchronization.Test
       run: |
         dotnet test -c Release src/Nethermind/Nethermind.Synchronization.Test
-    - name: Nethermind.TxPool.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Nethermind.TxPool.Test
   neth-tests5:
     name: Running Nethermind Tests 5
     runs-on: ubuntu-latest
@@ -207,15 +198,22 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libsnappy-dev libc6-dev libc6
-    - name: Nethermind.Ssz.Test
+    - name: Nethermind.TxPool.Test
       run: |
-        dotnet test -c Release src/Nethermind/Nethermind.Ssz.Test
+        dotnet test -c Release src/Nethermind/Nethermind.TxPool.Test   
+    - name: Nethermind.Trie.Test
+      run: |
+        dotnet test -c Release src/Nethermind/Nethermind.Trie.Test        
+    - name: Nethermind.Sockets.Test
+      run: |
+        dotnet test -c Release src/Nethermind/Nethermind.Sockets.Test        
     - name: Nethermind.Wallet.Test
       run: |
         dotnet test -c Release src/Nethermind/Nethermind.Wallet.Test
-    - name: Nethermind.Sockets.Test
+    - name: Nethermind.Ssz.Test
       run: |
-        dotnet test -c Release src/Nethermind/Nethermind.Sockets.Test
+        dotnet test -c Release src/Nethermind/Nethermind.Ssz.Test
+
   neth-runner:
     name: Nethermind Runner Tests
     runs-on: ubuntu-latest
@@ -237,8 +235,31 @@ jobs:
     - name: Nethermind.State.Test.Runner.Test
       run : |
         dotnet test -c Release src/Nethermind/Nethermind.State.Test.Runner.Test
-  eth-tests:
-    name: Running Ethereum Tests
+  eth-tests1:
+    name: Running Ethereum Tests 1
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setting up dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+    - name: Unshallow fetching
+      run: git fetch --unshallow
+    - name: Updating submodules
+      run: git -c submodule."src/eth2.0-spec-tests".update=none submodule update --init
+    - name: Ethereum.Basic.Test
+      run: |
+        dotnet test -c Release src/Nethermind/Ethereum.Basic.Test
+    - name: Ethereum.Blockchain.Block.Test
+      run: |
+        dotnet test -c Release src/Nethermind/Ethereum.Blockchain.Block.Test
+    - name: Ethereum.Blockchain.Test
+      run: |
+        dotnet test -c Release src/Nethermind/Ethereum.Blockchain.Test
+
+  eth-tests2:
+    name: Running Ethereum Tests 2
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -253,15 +274,6 @@ jobs:
     - name: Ethereum.Abi.Test
       run: |
         dotnet test -c Release src/Nethermind/Ethereum.Abi.Test
-    - name: Ethereum.Basic.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Ethereum.Basic.Test
-    - name: Ethereum.Blockchain.Block.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Ethereum.Blockchain.Block.Test
-    - name: Ethereum.Blockchain.Test
-      run: |
-        dotnet test -c Release src/Nethermind/Ethereum.Blockchain.Test
     - name: Ethereum.Difficulty.Test
       run: |
         dotnet test -c Release src/Nethermind/Ethereum.Difficulty.Test

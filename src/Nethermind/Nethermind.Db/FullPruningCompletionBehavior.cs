@@ -1,4 +1,4 @@
-﻿//  Copyright (c) 2021 Demerzel Solutions Limited
+//  Copyright (c) 2021 Demerzel Solutions Limited
 //  This file is part of the Nethermind library.
 // 
 //  The Nethermind library is free software: you can redistribute it and/or modify
@@ -16,18 +16,27 @@
 // 
 
 using System;
-using System.Threading.Tasks;
-using Nethermind.Consensus.Producers;
-using Nethermind.Core;
 
-namespace Nethermind.Merge.Plugin.BlockProduction
+namespace Nethermind.Db
 {
-    public interface IPayloadPreparationService
+    /// <summary>
+    /// Defines what to do when a full prune completes.
+    /// </summary>
+    public enum FullPruningCompletionBehavior
     {
-        string? StartPreparingPayload(BlockHeader parentHeader, PayloadAttributes payloadAttributes);
+        /// <summary>
+        /// Do nothing once pruning is completed.
+        /// </summary>
+        None,
 
-        Block? GetPayload(string payloadId);
+        /// <summary>
+        /// Shut Nethermind down gracefully if pruning was successful, but leave it running if it failed.
+        /// </summary>
+        ShutdownOnSuccess,
 
-        event EventHandler<BlockEventArgs>? BlockImproved;
+        /// <summary>
+        /// Shut Nethermind down gracefully when pruning completes, regardless of whether or not it succeeded.
+        /// </summary>
+        AlwaysShutdown
     }
 }

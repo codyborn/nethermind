@@ -1,4 +1,4 @@
-﻿//  Copyright (c) 2021 Demerzel Solutions Limited
+//  Copyright (c) 2021 Demerzel Solutions Limited
 //  This file is part of the Nethermind library.
 // 
 //  The Nethermind library is free software: you can redistribute it and/or modify
@@ -16,18 +16,14 @@
 // 
 
 using System;
-using System.Threading.Tasks;
-using Nethermind.Consensus.Producers;
-using Nethermind.Core;
+using System.Collections;
+using System.Collections.Generic;
 
-namespace Nethermind.Merge.Plugin.BlockProduction
+namespace Nethermind.JsonRpc.Modules.Rpc;
+
+[RpcModule(ModuleType.Rpc)]
+public interface IRpcRpcModule: IRpcModule
 {
-    public interface IPayloadPreparationService
-    {
-        string? StartPreparingPayload(BlockHeader parentHeader, PayloadAttributes payloadAttributes);
-
-        Block? GetPayload(string payloadId);
-
-        event EventHandler<BlockEventArgs>? BlockImproved;
-    }
+    [JsonRpcMethod(Description = "Retrieves a list of modules.", IsImplemented = true, IsSharable = true)]
+    ResultWrapper<IDictionary<String, String>> rpc_modules();
 }
